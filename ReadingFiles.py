@@ -28,8 +28,8 @@ with open('Claim cleaned.csv') as file_obj:
 
     # Iterate over each row in the csv
     # file using reader object
-    # for row in dict_reader:
-        # print(row)
+    for row in dict_reader:
+        print(row)
 
     # prints the sum of missing values within each column in both files.
     print(main.claim.isnull().sum(), '\n')
