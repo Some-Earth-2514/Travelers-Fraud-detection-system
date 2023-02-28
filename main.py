@@ -34,7 +34,7 @@ VEH_PRIMARY_PT_OF_DAMAGE = claimant['VEH_PRIMARY_PT_OF_DAMAGE'].tolist()
 AIRBAG_DEPLOYED = claimant['AIRBAG_DEPLOYED'].tolist()
 VEH_SPEED_AT_IMPACT = claimant['VEH_SPEED_AT_IMPACT'].tolist()
 
-junk = set()
+junk_inital = set()
 
 
 def read_datasets():
@@ -51,6 +51,13 @@ def fraud():
 
 def not_fraud():
     pass
+
+
+def junk():
+    sorted_set = sorted(junk_inital)
+    print(sorted_set)
+
+    return junk
 
 
 def policy_state():
@@ -73,21 +80,13 @@ def policy_state():
             count_num += 1
             junk_policy_state.append(i)
 
-    junk.update(junk_policy_state)
+    junk_inital.update(junk_policy_state)
 
     print(count_num)
     print(junk_policy_state)
-    print(junk)
+    print(junk_inital)
 
     return policy_state
-
-
-def claimant_numbers():
-    pass
-
-
-def injured_numbers():
-    pass
 
 
 def birth_date():  # done
@@ -109,11 +108,11 @@ def birth_date():  # done
             count += 1  # 47
             junk_bd.append(i)
 
-    junk.update(junk_bd)
+    junk_inital.update(junk_bd)
 
     print(f"Below 18: {count}")
     print(junk_bd)
-    print(junk)
+    print(junk_inital)
 
     return birth_date
 
@@ -128,11 +127,11 @@ def vehicle_year():  # done
             count += 1
             junk_veh_yr.append(col)
 
-    junk.update(junk_veh_yr)
+    junk_inital.update(junk_veh_yr)
 
     print(count)
     print(junk_veh_yr)
-    print(junk)
+    print(junk_inital)
 
     return vehicle_year
 
@@ -148,4 +147,8 @@ if __name__ == "__main__":
 
     print("Vehicle year")
     vehicle_year()
+    print()
+
+    print("Junk")
+    junk()
     print()
