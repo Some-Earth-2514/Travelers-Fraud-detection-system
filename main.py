@@ -1,9 +1,13 @@
 import pandas as pd
 import datetime as dt
+import csv
 
 # def CTL():
 # reading CSV file
 claim = pd.read_csv("Claim cleaned.csv")
+claimant = pd.read_csv("Claimant cleaned.csv")
+dict_claim = csv.DictReader(claim)
+dict_claimant = csv.DictReader(claimant)
 
 # converting column data to list
 
@@ -16,6 +20,21 @@ CLAIM_INDEMNITY_EST_AMT = claim['CLAIM_INDEMNITY_EST_AMT'].tolist()
 POL_NBR = claim['POL_NBR'].tolist()
 POLICY_STATE = claim['POLICY_STATE'].tolist()
 PRI_BTH_DT = claim['PRI_BTH_DT'].tolist()
+
+# CLM_NBR = claimant['CLM_NBR'].tolist()
+AUTO_ACCIDENT_DESC = claimant['AUTO_ACCIDENT_DESC'].tolist()
+CLAIMANT_STATUS = claimant['CLAIMANT_STATUS'].tolist()
+APPR_DAM_EST_REC_CNT = claimant['APPR_DAM_EST_REC_CNT'].tolist()
+VEH_COLR_TXT = claimant['VEH_COLR_TXT'].tolist()
+VEH_DAM_TXT = claimant['VEH_DAM_TXT'].tolist()
+CLMT_VEH_MDL_NM = claimant['CLMT_VEH_MDL_NM'].tolist()
+CLMT_VEH_YR = claimant['CLMT_VEH_YR'].tolist()
+VEH_TYPE = claimant['VEH_TYPE'].tolist()
+VEH_PRIMARY_PT_OF_DAMAGE = claimant['VEH_PRIMARY_PT_OF_DAMAGE'].tolist()
+AIRBAG_DEPLOYED = claimant['AIRBAG_DEPLOYED'].tolist()
+VEH_SPEED_AT_IMPACT = claimant['VEH_SPEED_AT_IMPACT'].tolist()
+
+junk = set()
 
 
 def read_datasets():
@@ -35,25 +54,30 @@ def not_fraud():
 
 
 def policy_state():
-    count_null = 0
-    # iterates through colm policy_state
-    for column in POLICY_STATE:
-        if not isinstance(column, str):
-            count_null += 1
-
-    integers = [item for item in POLICY_STATE if isinstance(item, int)]
-    # prints null values identified
-    print("The total number of integer value's in POLICY_STATE is", count_null)
-
+    # appends the index of list 'POLICY_STATE' that is tested when counts are indexed
+    junk_policy_state = []
     count_num = 0
-    count = pd.to_numeric(claim['POLICY_STATE'], errors='coerce').notnull()
-    # returns a list of variables
-    # iterates through count
-    for i in count:
-        if i:
+
+    # create a pandas Series from the list 'a'
+    series_a = pd.Series(POLICY_STATE)
+
+    # apply pd.to_numeric() with errors='coerce' to convert non-numeric values to NaN
+    numeric_series = series_a.apply(pd.to_numeric, errors='coerce')
+
+    # apply notnull() to return a boolean series indicating which values are not null
+    count = numeric_series.notnull()
+
+    # iterates through count & check if true
+    for i in range(len(count)):
+        if count[i]:
             count_num += 1
-    # prints int values identified
-    print("The total number of null/blank value's in POLICY_STATE is", count_num)
+            junk_policy_state.append(i)
+
+    junk.update(junk_policy_state)
+
+    print(count_num)
+    print(junk_policy_state)
+    print(junk)
 
     return policy_state
 
@@ -66,60 +90,62 @@ def injured_numbers():
     pass
 
 
-def birth_date():
+def birth_date():  # done
     # counters for ages below 18 and above 80
-    count_18 = 0
-    count_80 = 0
+    count = 0
+    junk_bd = []  # list holding index val. of fraud detected birthday
 
     # iterate through the PRI_BTH_DT colm
-    for i in PRI_BTH_DT:
+    for i in range(len(PRI_BTH_DT)):
         # person's birthdate in datetime format
-        bd = pd.to_datetime(i)
+        bd = pd.to_datetime(PRI_BTH_DT[i])
         # current datetime
         current_dt = pd.to_datetime(dt.date.today())
         current_age = (current_dt - bd) // pd.Timedelta(days=365.25)  # calculating age
         # print(current_age)
         # looping through for checking age bounds
-        # total = 117
+        # total = 47
         if current_age < 18:
-            count_18 += 1  # 47
-        if current_age > 80:  # 70
-            count_80 += 1
+            count += 1  # 47
+            junk_bd.append(i)
 
-    print(f"Below 18: {count_18}")
-    print(f"Above 80: {count_80}")
+    junk.update(junk_bd)
+
+    print(f"Below 18: {count}")
+    print(junk_bd)
+    print(junk)
 
     return birth_date
 
 
-def expense():
-    exp = []
+def vehicle_year():  # done
+    junk_veh_yr = []
 
     count = 0
     # counts how many entries of one are greater than two
-    for col in range(len(CLAIM_EXPENSE_EST_AMT)):
-        if CLAIM_EXPENSE_EST_AMT[col] > CLAIM_INDEMNITY_EST_AMT[col]:
+    for col in range(len(CLMT_VEH_YR)):
+        if CLMT_VEH_YR[col] == 1900:
             count += 1
-            exp.append(col)
+            junk_veh_yr.append(col)
+
+    junk.update(junk_veh_yr)
+
     print(count)
-    print(exp)
+    print(junk_veh_yr)
+    print(junk)
 
-    return expense
-
-
-def vehicle_year():
-    pass
-
-
-def airbags():
-    pass
-
-
-def speed():
-    pass
+    return vehicle_year
 
 
 if __name__ == "__main__":
+    print("Policy state")
     policy_state()
+    print()
+
+    print("Birth date")
     birth_date()
-    expense()
+    print()
+
+    print("Vehicle year")
+    vehicle_year()
+    print()
