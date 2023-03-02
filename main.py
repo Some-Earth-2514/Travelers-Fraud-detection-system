@@ -4,16 +4,18 @@ import csv
 
 # def CTL():
 # reading CSV file
-claim = pd.read_csv("Claim cleaned.csv")
-claimant = pd.read_csv("Claimant cleaned.csv")
-dict_claim = csv.DictReader(claim)
-dict_claimant = csv.DictReader(claimant)
-csv_claim = csv.reader("Claim cleaned.csv")
-csv_claimant = csv.reader("Claimant cleaned.csv")
+claim = pd.read_csv("Claim.csv")
+claimant = pd.read_csv("Claimant.csv")
+
+claim_cleaned = pd.read_csv("Claim_cleaned.csv")
+claimant_cleaned = pd.read_csv("Claimant_cleaned.csv")
+
+csv_claim = csv.reader("Claim.csv")
+csv_claimant = csv.reader("Claimant.csv")
 print(csv_claim)
 
 # converting column data to list
-
+# ORIGINAL
 CLM_NBR = claim['CLM_NBR'].tolist()
 NBR_OF_CLMT = claim['NBR_OF_CLMT'].tolist()
 BI_CLMT_CNT = claim['BI_CLMT_CNT'].tolist()
@@ -36,6 +38,35 @@ VEH_TYPE = claimant['VEH_TYPE'].tolist()
 VEH_PRIMARY_PT_OF_DAMAGE = claimant['VEH_PRIMARY_PT_OF_DAMAGE'].tolist()
 AIRBAG_DEPLOYED = claimant['AIRBAG_DEPLOYED'].tolist()
 VEH_SPEED_AT_IMPACT = claimant['VEH_SPEED_AT_IMPACT'].tolist()
+
+
+
+# CLEANED
+CLM_NBR_c = claim_cleaned['CLM_NBR'].tolist()
+NBR_OF_CLMT_c = claim_cleaned['NBR_OF_CLMT'].tolist()
+BI_CLMT_CNT_c = claim_cleaned['BI_CLMT_CNT'].tolist()
+COV_RGST_DT_c = claim_cleaned['COV_RGST_DT'].tolist()
+CLAIM_EXPENSE_EST_AMT_c = claim_cleaned['CLAIM_EXPENSE_EST_AMT'].tolist()
+CLAIM_INDEMNITY_EST_AMT_c = claim_cleaned['CLAIM_INDEMNITY_EST_AMT'].tolist()
+POL_NBR_c = claim_cleaned['POL_NBR'].tolist()
+POLICY_STATE_c = claim_cleaned['POLICY_STATE'].tolist()
+PRI_BTH_DT_c = claim_cleaned['PRI_BTH_DT'].tolist()
+
+# CLM_NBR = claimant['CLM_NBR'].tolist()
+AUTO_ACCIDENT_DESC_c = claimant_cleaned['AUTO_ACCIDENT_DESC'].tolist()
+CLAIMANT_STATUS_c = claimant_cleaned['CLAIMANT_STATUS'].tolist()
+APPR_DAM_EST_REC_CNT_c = claimant_cleaned['APPR_DAM_EST_REC_CNT'].tolist()
+VEH_COLR_TXT_c = claimant_cleaned['VEH_COLR_TXT'].tolist()
+VEH_DAM_TXT_c = claimant_cleaned['VEH_DAM_TXT'].tolist()
+CLMT_VEH_MDL_NM_c = claimant_cleaned['CLMT_VEH_MDL_NM'].tolist()
+CLMT_VEH_YR_c = claimant_cleaned['CLMT_VEH_YR'].tolist()
+VEH_TYPE_c = claimant_cleaned['VEH_TYPE'].tolist()
+VEH_PRIMARY_PT_OF_DAMAGE_c = claimant_cleaned['VEH_PRIMARY_PT_OF_DAMAGE'].tolist()
+AIRBAG_DEPLOYED_c = claimant_cleaned['AIRBAG_DEPLOYED'].tolist()
+VEH_SPEED_AT_IMPACT_c = claimant_cleaned['VEH_SPEED_AT_IMPACT'].tolist()
+
+
+
 
 junk_initial = set()
 clean_initial = set()
@@ -164,7 +195,14 @@ def junk():
     print(junk_sorted)
 
     # Read in the input file and remove the specified rows
-    with open("Claim cleaned.csv", 'r') as f_in_claim, open("JunkRemoved.csv", 'w', newline='') as f_out_junk:
+    with open("Claim.csv", 'r') as f_in_claim, open("Claim_cleaned.csv", 'w', newline='') as f_out_junk:
+        reader = csv.reader(f_in_claim)
+        writer = csv.writer(f_out_junk)
+        for i, row in enumerate(reader):
+            if i not in junk_sorted:
+                writer.writerow(row)
+
+    with open("Claimant.csv", 'r') as f_in_claim, open("Claimant_cleaned.csv", 'w', newline='') as f_out_junk:
         reader = csv.reader(f_in_claim)
         writer = csv.writer(f_out_junk)
         for i, row in enumerate(reader):
@@ -174,19 +212,19 @@ def junk():
     return junk_sorted
 
 
-def clean():
-    clean_sorted = sorted(index + 1 for index in clean_initial)
-    print(clean_sorted)
-
-    # Read in the input file and remove the specified rows
-    with open("Claim cleaned.csv", 'r') as f_in_claim, open("CleanSorted.csv", 'w', newline='') as f_out_clean:
-        reader = csv.reader(f_in_claim)
-        writer = csv.writer(f_out_clean)
-        for i, row in enumerate(reader):
-            if i not in clean_sorted:
-                writer.writerow(row)
-
-    return clean_sorted
+# def clean():
+#     clean_sorted = sorted(index + 1 for index in clean_initial)
+#     print(clean_sorted)
+#
+#     # Read in the input file and remove the specified rows
+#     with open("Claim.csv", 'r') as f_in_claim, open("CleanSorted.csv", 'w', newline='') as f_out_clean:
+#         reader = csv.reader(f_in_claim)
+#         writer = csv.writer(f_out_clean)
+#         for i, row in enumerate(reader):
+#             if i not in clean_sorted:
+#                 writer.writerow(row)
+#
+#     return clean_sorted
 
 
 def alea_fraud():
@@ -194,16 +232,16 @@ def alea_fraud():
     count_ALAE = 0
     total_legal_fees = 0
 
-    for i in range(len(CLAIM_EXPENSE_EST_AMT)):
+    for i in range(len(CLAIM_EXPENSE_EST_AMT_c)):
         # check bodily & multiple
         # if VEH_PRIMARY_PT_OF_DAMAGE is not none and AUTO_ACCIDENT_DESC is multi
         # multi by collision cost
-        total_legal_fees = BI_CLMT_CNT[i] * 15785
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'No Damage':
+        total_legal_fees = BI_CLMT_CNT_c[i] * 15785
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'No Damage':
             total_legal_fees += 0
         else:
             total_legal_fees += 4698
-        if CLAIM_EXPENSE_EST_AMT[i] > total_legal_fees:
+        if CLAIM_EXPENSE_EST_AMT_c[i] > total_legal_fees:
             fraud_ALAE.append(i)
             count_ALAE += 1
 
@@ -220,42 +258,42 @@ def indemnity_fraud():
     fraud_indemity = []
     count = 0
 
-    for i in range(len(CLAIM_INDEMNITY_EST_AMT)):
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'All Over':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 118258.5:
+    for i in range(len(CLAIM_INDEMNITY_EST_AMT_c)):
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'All Over':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 118258.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Complete Drivers Side':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 49868.75:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Complete Drivers Side':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 49868.75:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Complete Front End':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 73086.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Complete Front End':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 73086.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Complete Passenger Side':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 85506.50:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Complete Passenger Side':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 85506.50:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Complete Rear End':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 19917.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Complete Rear End':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 19917.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Drivers Center':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 83830.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Drivers Center':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 83830.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Driver Front Corner':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 61479.75:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Driver Front Corner':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 61479.75:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Driver Rear Corner':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 46557.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Driver Rear Corner':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 46557.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'No Damage':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 16612.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'No Damage':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 16612.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Passenger Center':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 58335.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Passenger Center':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 58335.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Passenger Front Corner':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 48570.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Passenger Front Corner':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 48570.5:
                 fraud_indemity.append(i)
-        if VEH_PRIMARY_PT_OF_DAMAGE[i] == 'Passenger Rear Corner':
-            if CLAIM_INDEMNITY_EST_AMT[i] > 46471.5:
+        if VEH_PRIMARY_PT_OF_DAMAGE_c[i] == 'Passenger Rear Corner':
+            if CLAIM_INDEMNITY_EST_AMT_c[i] > 46471.5:
                 fraud_indemity.append(i)
 
     for i in fraud_indemity:
@@ -274,8 +312,8 @@ def inspection_fraud():
     fraud_inspections = []
     count_inspections = 0
 
-    for i in range(len(APPR_DAM_EST_REC_CNT)):
-        if APPR_DAM_EST_REC_CNT[i] > 4:
+    for i in range(len(APPR_DAM_EST_REC_CNT_c)):
+        if APPR_DAM_EST_REC_CNT_c[i] >= 4:
             fraud_inspections.append(i)
             count_inspections += 1
 
@@ -287,7 +325,25 @@ def inspection_fraud():
 
 
 def fraud():
-    pass
+    fraud_sorted = sorted(index + 1 for index in fraud_initial)
+    print(fraud_sorted)
+
+    # Read in the input file and remove the specified rows
+    with open("Claim_cleaned.csv", 'r') as f_in_claim, open("FraudFound_claim.csv", 'w', newline='') as f_out_junk:
+        reader = csv.reader(f_in_claim)
+        writer = csv.writer(f_out_junk)
+        for i, row in enumerate(reader):
+            if i in fraud_sorted:
+                writer.writerow(row)
+
+    with open("Claimant_cleaned.csv", 'r') as f_in_claim, open("FraudFound_claimant.csv", 'w', newline='') as f_out_junk:
+        reader = csv.reader(f_in_claim)
+        writer = csv.writer(f_out_junk)
+        for i, row in enumerate(reader):
+            if i not in fraud_sorted:
+                writer.writerow(row)
+
+    return fraud_sorted
 
 
 def not_fraud():
@@ -311,9 +367,9 @@ if __name__ == "__main__":
     junk()
     print()
 
-    print("Clean")
-    clean()
-    print()
+    # print("Clean")
+    # clean()
+    # print()
 
     print("ALEA fraud")
     alea_fraud()
@@ -325,4 +381,8 @@ if __name__ == "__main__":
 
     print("Inspection fraud")
     inspection_fraud()
+    print()
+
+    print("Fraud")
+    fraud()
     print()
